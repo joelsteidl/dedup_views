@@ -6,10 +6,17 @@
 
 /**
   * @implements hook_views_pre_view().
+  *
+  * https://api.drupal.org/api/views/views.api.php/function/hook_views_pre_view/7
   */
 function dedup_views_views_pre_view(&$view, &$display_id, &$args){
+  // Uncomment if using Devel Module to find the name of the View & View Display
+  // dpm($view);
+
+  // View that loading to get NIDs for exclusion
   $featured_view_name = 'featured_news';
   $featured_view_display = 'block';
+  // View that is being deduped
   $automated_view_name = 'automated_news';
   $automated_view_display = 'block';
 
@@ -17,9 +24,10 @@ function dedup_views_views_pre_view(&$view, &$display_id, &$args){
   if ($view->name == $automated_view_name && $display_id == $automated_view_display) {
     $node_ids = dedup_views_nids_for_exlusion($featured_view_name, $featured_view_display);
 
-    // Pass in nids of manually referenced content for exlucsion (or de-duping)
+    // Pass in NIDs of manually referenced content for exlucsion (or de-duping)
     if (!empty($node_ids)) {
-      // $args[] are Views Arguments
+      // $args[] are Views Arguments for the Contextual Filter
+      // A contectual filter must be added and configured to your view
       $args[] = $node_ids;
     }
   }
@@ -44,14 +52,14 @@ function dedup_views_nids_for_exlusion($view_name,$view_display) {
     // Build the final array of nids for exlusion
     foreach ($results as $result) {
       // The result nid may not always be in the same location
-      // dpm($result) to help troubleshoot
+      // dpm($result) to help troubleshoot...Devel Module Required
       if (isset($result->nid)) {
         $nids[] = $result->nid;
       }
     }
 
     // Return $nids in a format we need (comma or plus seperated)
-    // This is the same format Views would expect if
+    // This is the same format the Views contextual filter would expect if
     // You manually typed in a list of NIDs
     return implode('+', $nids);
   }
