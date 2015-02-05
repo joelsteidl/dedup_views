@@ -13,7 +13,7 @@ function dedup_views_views_pre_view(&$view, &$display_id, &$args){
   // Uncomment if using Devel Module to find the name of the View & View Display
   // dpm($view);
 
-  // View that loading to get NIDs for exclusion
+  // View that is loaded in code to get NIDs for exclusion
   $featured_view_name = 'featured_news';
   $featured_view_display = 'block';
   // View that is being deduped
