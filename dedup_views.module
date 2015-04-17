@@ -13,27 +13,32 @@ function dedup_views_views_pre_view(&$view, &$display_id, &$args){
   // Uncomment if using Devel Module to find the name of the View & View Display
   // dpm($view);
 
-  // View that is loaded in code to get NIDs for exclusion
-  $featured_view_name = 'featured_news';
-  $featured_view_display = 'block';
-  // View that is being deduped
-  $automated_view_name = 'automated_news';
-  $automated_view_display = 'block';
+  $dedup_views = array();
+  $dedup_views[] = array(
+    // View that is loaded in code to get NIDs for exclusion
+    'featured_view_name' => 'featured_news',
+    'featured_view_display' => 'block',
+    // View that is being deduped
+    'automated_view_name' => 'automated_news',
+    'automated_view_display' => 'block',
+  );
 
   // Only modify the view we intend to
-  if ($view->name == $automated_view_name && $display_id == $automated_view_display) {
-    $node_ids = dedup_views_nids_for_exlusion($featured_view_name, $featured_view_display);
+  foreach ($dedup_views as $dedup_view) {
+    if ($view->name == $dedup_view['automated_view_name'] && $display_id == $dedup_view['automated_view_display']) {
+      $node_ids = dedup_views_nids_for_exlusion($dedup_view['featured_view_name'], $dedup_view['featured_view_display']);
 
-    // Pass in NIDs of manually referenced content for exlucsion (or de-duping)
-    if (!empty($node_ids)) {
-      // $args[] are Views Arguments for the Contextual Filter
-      // A contectual filter must be added and configured to your view
-      $args[] = $node_ids;
+      // Pass in NIDs of manually referenced content for exlucsion (or de-duping)
+      if (!empty($node_ids)) {
+        // $args[] are Views Arguments for the Contextual Filter
+        // A contectual filter must be added and configured to your view
+        $args[] = $node_ids;
+      }
     }
   }
 }
 
-function dedup_views_nids_for_exlusion($view_name,$view_display) {
+function dedup_views_nids_for_exlusion($view_name, $view_display) {
   $nids = array();
   $results = array();
 
@@ -63,5 +68,4 @@ function dedup_views_nids_for_exlusion($view_name,$view_display) {
     // You manually typed in a list of NIDs
     return implode('+', $nids);
   }
-
 }
